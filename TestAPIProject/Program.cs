@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using TestAPIProject.Data;
+using TestAPIProject.Middlewares;
 using TestAPIProject.Repositories;
 using TestAPIProject.Services;
+using AutoMapper;
+using TestAPIProject.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Configure DbContext (SQL Server)
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -24,6 +30,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using TestAPIProject.Models;
+using TestAPIProject.Dtos;
 using TestAPIProject.Services;
 
 namespace TestAPIProject.Controllers
@@ -22,7 +22,7 @@ namespace TestAPIProject.Controllers
             return Ok(products);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var product = await _service.GetByIdAsync(id);
@@ -31,7 +31,7 @@ namespace TestAPIProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<IActionResult> Create([FromBody] CreateProductDto product)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var created = await _service.CreateAsync(product);
@@ -39,7 +39,7 @@ namespace TestAPIProject.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Product product)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto product)
         {
             if (id != product.Id) return BadRequest();
             await _service.UpdateAsync(product);

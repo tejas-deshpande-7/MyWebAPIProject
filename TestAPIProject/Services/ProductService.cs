@@ -1,3 +1,5 @@
+using AutoMapper;
+using TestAPIProject.Dtos;
 using TestAPIProject.Models;
 using TestAPIProject.Repositories;
 
@@ -6,17 +8,20 @@ namespace TestAPIProject.Services
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProductService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<Product> CreateAsync(Product product)
+        public async Task<ProductDto> CreateAsync(CreateProductDto product)
         {
-            var created = await _unitOfWork.Products.CreateAsync(product);
+            var entity = _mapper.Map<Product>(product);
+            var created = await _unitOfWork.Products.CreateAsync(entity);
             await _unitOfWork.CommitAsync();
-            return created;
+            return _mapper.Map<ProductDto>(created);
         }
 
         public async Task DeleteAsync(int id)
@@ -25,19 +30,22 @@ namespace TestAPIProject.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public Task<IEnumerable<Product>> GetAllAsync()
+        public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
-            return _unitOfWork.Products.GetAllAsync();
+            var products = await _unitOfWork.Products.GetAllAsync();
+            return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
-        public Task<Product?> GetByIdAsync(int id)
+        public async Task<ProductDto?> GetByIdAsync(int id)
         {
-            return _unitOfWork.Products.GetByIdAsync(id);
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
+            return _mapper.Map<ProductDto?>(product);
         }
 
-        public async Task UpdateAsync(Product product)
+        public async Task UpdateAsync(UpdateProductDto product)
         {
-            await _unitOfWork.Products.UpdateAsync(product);
+            var entity = _mapper.Map<Product>(product);
+            await _unitOfWork.Products.UpdateAsync(entity);
             await _unitOfWork.CommitAsync();
         }
     }
